@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 # from rest_framework import serializers
 
-from .models import Poll, Choice, User
+from .models import Poll, Choice, User, Vote
 from .serializers import PollSerializer, ChoiceSerializer, VoteSerializer, UserSerializer
 
 from django.contrib.auth import authenticate
@@ -43,17 +43,22 @@ class ChoiceList(generics.ListCreateAPIView):
         return queryset
     serializer_class = ChoiceSerializer
 
-class CreateVote(APIView):
+class CreateVote(generics.ListCreateAPIView):
 
-    def post(self, request, pk, choice_pk):
-        voted_by = request.data.get("voted_by")
-        data = {'choice': choice_pk, 'poll': pk, 'voted_by': voted_by}
-        serializer_class= VoteSerializer(data=data)
-        if serializer_class.is_valid():
-            vote = serializer_class.save()
-            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        query_set = Vote.objects.all()
+        return query_set
+    serializer_class = VoteSerializer
+
+    # def post(self, request, pk, choice_pk):
+    #     voted_by = request.data.get("voted_by")
+    #     data = {'choice': choice_pk, 'poll': pk, 'voted_by': voted_by}
+    #     serializer_class= VoteSerializer(data=data)
+    #     if serializer_class.is_valid():
+    #         vote = serializer_class.save()
+    #         return Response(serializer_class.data, status=status.HTTP_201_CREATED)
+    #     else:
+    #         return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
