@@ -4,8 +4,9 @@ from rest_framework import status, viewsets
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
+# from rest_framework import serializers
 
-from .models import Poll, Choice
+from .models import Poll, Choice, User
 from .serializers import PollSerializer, ChoiceSerializer, VoteSerializer, UserSerializer
 
 from django.contrib.auth import authenticate
@@ -20,8 +21,10 @@ class LoginView(viewsets.ViewSet):
 
 
 class UserCreate(generics.CreateAPIView):
-    authentication_classes = ()
-    permission_classes = ()
+    #To use CreateAPIView Only you the commented style below, though it works fine with just querry_set too
+    # authentication_classes = ()
+    # permission_classes = ()
+    queryset = User.objects.all()
     serializer_class = UserSerializer
 
 class PollList(generics.ListCreateAPIView):
@@ -45,12 +48,12 @@ class CreateVote(APIView):
     def post(self, request, pk, choice_pk):
         voted_by = request.data.get("voted_by")
         data = {'choice': choice_pk, 'poll': pk, 'voted_by': voted_by}
-        serializer_class = VoteSerializer(data=data)
-        if serializer.is_valid():
-            vote = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer_class= VoteSerializer(data=data)
+        if serializer_class.is_valid():
+            vote = serializer_class.save()
+            return Response(serializer_class.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
