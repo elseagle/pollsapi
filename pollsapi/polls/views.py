@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-
+from .serializers import PollSerializer
 from .models import Poll
 
 # Create your views here.
@@ -9,9 +9,7 @@ from .models import Poll
 def polls_list(request):
     MAX_OBJECTS = 20
     polls = Poll.objects.all()[:MAX_OBJECTS]
-    data = {
-            "results": list(polls.values("question", "created_by__username", "pub_date"))
-            }
+    data = PollSerializer(polls, many=True)
     return JsonResponse(data)
 
 def polls_detail(request, pk):
